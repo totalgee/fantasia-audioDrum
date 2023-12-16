@@ -6,6 +6,7 @@
 #include <Encoder.h>
 #include "fantasia.hpp"
 
+////////////////////////////////////////////////////////////
 // GUItool: begin automatically generated code
 AudioInputI2S            i2s1;           //xy=114.20000839233398,103.20000267028809
 AudioSynthSimpleDrum     drum1;          //xy=183.20000076293945,261.59996604919434
@@ -29,30 +30,26 @@ AudioConnection          patchCord7(filter1, 0, envelope1, 0);
 AudioConnection          patchCord8(envelope1, 0, mixer1, 2);
 AudioConnection          patchCord9(mixer1, 0, i2s2, 0);
 // GUItool: end automatically generated code
+////////////////////////////////////////////////////////////
 
 Fantasia f;
 
 void setup() {
   // put your setup code here, to run once:
-  f.setupAudio();
+  Serial.begin(38400); 
+  f.setup();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   f.update();
+  f.printState();
 
-  printState();
-}
-
-void printState() {
-  Serial.println("Pots:");
-  for (auto pot : f.pots) {
-    Serial.println(f.get(pot));
+  static int count = 0;
+  if (count % 125 == 0) {
+    int showNum = (count / 125) % 16;
+    f.displayHex(showNum, showNum % 4 == 0);
   }
-
-  Serial.println("Buttons:");
-  for (auto button : f.buttons) {
-    Serial.println(f.get(button));
-  }
-
+  ++count;
+  delayMicroseconds(1000);
 }
