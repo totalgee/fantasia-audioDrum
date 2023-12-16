@@ -26,6 +26,9 @@ void Fantasia::update()
   for (int i = 0; i < kNumButtons; ++i) {
     buttonValues[i] = !digitalRead(kButtonPins[i]);
   }
+  for (int i = 0; i < kNumGates; ++i) {
+    gateValues[i] = !digitalRead(kGatePins[i]);
+  }
   encoderPressed = !digitalRead(kEncoderButtonPin);
   encoderPosition = encoder.read() / 4;
 }
