@@ -38,7 +38,7 @@ private:
   void setupPins();
 
   std::array<float, kNumPots>   potValues{};
-  std::array<bool, kNumPots>    buttonValues{};
+  std::array<bool, kNumButtons> buttonValues{};
   std::array<bool, kNumGates>   gateValues{};
 
   Encoder                       encoder{ PIN_SERIAL_RX, PIN_SERIAL_TX };
