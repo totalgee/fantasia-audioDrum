@@ -44,6 +44,12 @@ void Fantasia::printState()
     Serial.print(' ');
   }
 
+  Serial.print("\nGates: ");
+  for (auto gate : gates) {
+    Serial.print(get(gate));
+    Serial.print(' ');
+  }
+
   Serial.print("\nEncoder position: ");
   Serial.print(getEncoder());
   Serial.print(" pressed: ");
