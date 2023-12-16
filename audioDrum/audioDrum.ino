@@ -21,6 +21,9 @@
 #include "fantasia.hpp"
 
 ////////////////////////////////////////////////////////////
+// From Teensy Audio System Design Tool
+// https://www.pjrc.com/teensy/gui/index.html
+////////////////////////////////////////////////////////////
 // GUItool: begin automatically generated code
 AudioInputI2S            i2s1;           //xy=114.20000839233398,103.20000267028809
 AudioSynthSimpleDrum     drum1;          //xy=183.20000076293945,261.59996604919434
