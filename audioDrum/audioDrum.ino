@@ -1,3 +1,17 @@
+// "Audio drum" example for Befaco/Familiar's "Fantasia" hardware (custom Teensy-based device)
+// by Glen Fraser (totalgee)
+//
+// This is a work in progress, started during the December 2023 hackathon in Barcelona.
+//
+// Currently it only plays beats/sounds according to the clock, and prints out
+// some debug info on the serial port. The LED display updates continuously with
+// the beat number.
+//
+// The A pot controls the "hit detection" threshold, for audio coming in
+// on the left input.
+// The B pot controls the "hit detection" tone, for audio coming in on the
+// left input.
+
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -34,6 +48,13 @@ AudioConnection          patchCord10(mixer1, 0, i2s2, 1);
 
 Fantasia f;
 
+struct {
+  float peakToPeakAmp = 0;
+  float toneLevel = 0;
+  bool toneHit = false;
+  float rmsLevel = 0;
+} data;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200); 
@@ -43,16 +64,46 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   f.update();
+  tone1.threshold(f.get(Fantasia::Pot::A));
+  float const freq = midicps(map(f.get(Fantasia::Pot::B), 0, 1, 24, 120));
+  tone1.frequency(freq);
+  analyzeAudio();
+
   f.printState();
+  printAudioInfo();
 
   static int count = 0;
   if (count % 125 == 0) {
+
     int beat = (count / 125) % 16;
     f.displayHex(beat, beat % 4 == 0);
     playSound(beat);
   }
   ++count;
   delayMicroseconds(1000);
+}
+
+void analyzeAudio() {
+    if (peak1.available()) {
+      data.peakToPeakAmp = peak1.readPeakToPeak();
+    }
+    if (tone1.available()) {
+      data.toneLevel = tone1.read();
+      data.toneHit = tone1;
+    }
+    if (rms1.available()) {
+      data.rmsLevel = rms1.read();
+    }
+}
+
+void printAudioInfo() {
+  Serial.print("Audio Peak: ");
+  Serial.print(data.peakToPeakAmp);
+  Serial.print(" / RMS: ");
+  Serial.print(data.rmsLevel);
+  Serial.print(" / Tone: ");
+  Serial.print(data.toneLevel);
+  Serial.println(data.toneHit ? " HIT!" : "");
 }
 
 void playSound(int beat) {
@@ -70,4 +121,12 @@ void playSound(int beat) {
     string1.noteOff(0);
     string1.noteOn(220 + beat * 110, 0.5);
   }
+}
+
+float midicps(float midinote) {
+  return 440 * pow(2.0, (midinote - 69) / 12.0);
+}
+
+float cpsmidi(float cps) {
+  return 12 * log(cps/220) / log(2.0) + 57;
 }
